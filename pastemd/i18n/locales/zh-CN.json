@@ -307,5 +307,9 @@
     "placer.macos_excel.script_timeout": "AppleScript 执行超时（30秒）",
     "placer.macos_wps.not_supported": "macOS WPS 当前模式下无法插入。\n\n说明:\n- macOS 版 WPS 通过剪贴板富文本粘贴（HTML/RTF）实现，可能需要授予“辅助功能/自动化”权限。",
     "placer.macos_wps_excel.not_supported": "WPS 表格仅支持在 macOS 上自动插入",
-    "placer.macos_wps_excel.insert_failed": "WPS 表格粘贴失败: {error}\n\n请检查:\n1. WPS 表格是否处于前台且已选中目标单元格\n2. 系统设置 → 隐私与安全 → 辅助功能：允许 PasteMD\n3. 如仍失败，可关闭 keep_format 再试（使用纯文本粘贴兜底）"
+    "placer.macos_wps_excel.insert_failed": "WPS 表格粘贴失败: {error}\n\n请检查:\n1. WPS 表格是否处于前台且已选中目标单元格\n2. 系统设置 → 隐私与安全 → 辅助功能：允许 PasteMD\n3. 如仍失败，可关闭 keep_format 再试（使用纯文本粘贴兜底）",
+    "workflow.reverse.paste_success": "已将富文本转换为 Markdown 并粘贴。",
+    "workflow.reverse.convert_failed": "富文本转 Markdown 失败，请检查 Pandoc 配置。",
+    "workflow.reverse.not_target_app": "反向粘贴：当前应用不在目标应用列表中。",
+    "hotkey.runner.reverse_invalid_config": "反向粘贴热键无效，已跳过绑定。\n\n错误：{error}"
 }

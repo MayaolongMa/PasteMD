@@ -307,5 +307,9 @@
     "placer.macos_excel.script_timeout": "AppleScript の実行がタイムアウトしました（30秒）",
     "placer.macos_wps.not_supported": "macOS の WPS は現在のモードでは挿入できません。\n\n補足:\n- macOS 版 WPS はクリップボードのリッチテキスト貼り付け（HTML/RTF）で実装されており、「アクセシビリティ/自動化」権限の付与が必要な場合があります。",
     "placer.macos_wps_excel.not_supported": "WPS 表計算は macOS でのみ自動挿入に対応しています",
-    "placer.macos_wps_excel.insert_failed": "WPS 表計算の貼り付けに失敗しました: {error}\n\n確認事項:\n1. WPS 表計算が前面にあり、対象セルが選択されていること\n2. システム設定 → プライバシーとセキュリティ → アクセシビリティ：PasteMD を許可\n3. それでも失敗する場合は keep_format をオフにして再試行してください（プレーンテキスト貼り付けで代替）"
+    "placer.macos_wps_excel.insert_failed": "WPS 表計算の貼り付けに失敗しました: {error}\n\n確認事項:\n1. WPS 表計算が前面にあり、対象セルが選択されていること\n2. システム設定 → プライバシーとセキュリティ → アクセシビリティ：PasteMD を許可\n3. それでも失敗する場合は keep_format をオフにして再試行してください（プレーンテキスト貼り付けで代替）",
+    "workflow.reverse.paste_success": "リッチテキストをMarkdownに変換して貼り付けました。",
+    "workflow.reverse.convert_failed": "リッチテキストをMarkdownに変換できませんでした。Pandocの設定を確認してください。",
+    "workflow.reverse.not_target_app": "リバース貼り付け：現在のアプリはターゲットアプリリストにありません。",
+    "hotkey.runner.reverse_invalid_config": "リバース貼り付けのホットキーが無効です。スキップしました。\n\nエラー: {error}"
 }

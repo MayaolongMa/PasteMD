@@ -4,6 +4,7 @@ from ..core.state import app_state
 from ..config.loader import ConfigLoader
 from ..service.notification.manager import NotificationManager
 from ..app.workflows import execute_paste_workflow
+from ..app.workflows.reverse import execute_reverse_paste_workflow
 from ..presentation.tray.menu import TrayMenuManager
 from ..presentation.tray.run import TrayRunner
 from ..presentation.hotkey.run import HotkeyRunner
@@ -29,7 +30,8 @@ class Container:
         self.hotkey_runner = HotkeyRunner(
             self.workflow_router,
             self.notification_manager,
-            self.config_loader
+            self.config_loader,
+            reverse_controller_callback=execute_reverse_paste_workflow,
         )
         
         # 设置热键重启回调

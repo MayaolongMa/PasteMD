@@ -88,6 +88,23 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         "md_to_rtf": [],
         "md_to_latex": [],
     },
+    # 反向粘贴配置
+    # 将剪贴板中 Word/WPS 的富文本（HTML）转换为 Markdown 后粘贴到 AI/浏览器等应用
+    # target_apps: 目标应用列表（空表示对所有应用生效）
+    #   格式（win）:   [{"name": "Chrome", "id": "chrome.exe"}, ...]
+    #   格式（macOS）: [{"name": "Chrome", "id": "com.google.Chrome"}, ...]
+    # window_patterns: 可选的正则表达式数组，用于匹配窗口标题（如 AI 聊天页面标题）
+    "reverse_paste": {
+        "enabled": False,
+        "hotkey": "<ctrl>+<shift>+v",
+        "output_style": "gfm",       # Markdown 输出格式（gfm / commonmark）
+        "keep_formula": True,        # True = 保留 $...$ LaTeX，False = 转为 MathML
+        "target_apps": [],
+        "window_patterns": [],
+        "pandoc_filters_by_conversion": {
+            "html_to_md": [],
+        },
+    },
     # 可扩展工作流配置
     # apps 格式（win）: [{"name": "Notion", "id": "/path/to/app", "window_patterns": [".*Notion.*"]}, ...]
     # apps 格式（macOS）: [{"name": "Notion", "id": "com.notionlabs.Notion", "window_patterns": [".*Notion.*"]}, ...]
