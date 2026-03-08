@@ -307,5 +307,9 @@
     "placer.macos_excel.script_timeout": "AppleScript execution timeout (30 seconds)",
     "placer.macos_wps.not_supported": "macOS WPS insertion is not available in this mode.\n\nNotes:\n- WPS on macOS uses clipboard rich-text paste (HTML/RTF) and may require Accessibility/Automation permissions.",
     "placer.macos_wps_excel.not_supported": "WPS Spreadsheet insertion is only supported on macOS",
-    "placer.macos_wps_excel.insert_failed": "WPS Spreadsheet paste failed: {error}\n\nPlease check:\n1. Is WPS Spreadsheet frontmost with a target cell selected?\n2. System Settings → Privacy & Security → Accessibility: allow PasteMD\n3. If it still fails, try disabling keep_format (fallback to plain-text paste)"
+    "placer.macos_wps_excel.insert_failed": "WPS Spreadsheet paste failed: {error}\n\nPlease check:\n1. Is WPS Spreadsheet frontmost with a target cell selected?\n2. System Settings → Privacy & Security → Accessibility: allow PasteMD\n3. If it still fails, try disabling keep_format (fallback to plain-text paste)",
+    "workflow.reverse.paste_success": "Rich text converted to Markdown and pasted.",
+    "workflow.reverse.convert_failed": "Failed to convert rich text to Markdown. Check Pandoc configuration.",
+    "workflow.reverse.not_target_app": "Reverse paste: current app is not in the target app list.",
+    "hotkey.runner.reverse_invalid_config": "Reverse paste hotkey is invalid and was skipped.\n\nError: {error}"
 }

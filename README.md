@@ -46,6 +46,8 @@
 
 **✨ 新功能**：转换增强：支持按转换类型配置 Pandoc Filters；自动修复部分 LaTeX 语法与单 `$...$` 公式块。
 
+**✨ 新功能**：反向粘贴（`Ctrl+Shift+V`）：将 Word/WPS 富文本一键转换为 Markdown，粘贴到 AI 应用。
+
 ---
 
 ## 功能特点
@@ -78,6 +80,7 @@
 * **✨ 智能识别 Markdown 表格**，自动粘贴到 Excel。
 * **✨ 应用扩展**：为不同应用配置 HTML+Markdown/HTML/Markdown/LaTeX/文件 粘贴模式，支持按窗口标题匹配。
 * **✨ 转换增强**：按转换类型添加 Pandoc Filters，自动修复部分 LaTeX 语法与单 `$...$` 公式块。
+* **✨ 反向粘贴**：将 Word/WPS 富文本（HTML）转换为 Markdown，一键粘贴到 AI 应用（ChatGPT/DeepSeek 等）。
 * 自动识别当前前台应用：Word 或 WPS。
 * 智能打开所需应用为Word/Excel。
 * 托盘菜单，可保留文件、查看日志/配置等。
@@ -225,11 +228,65 @@
 * **`pandoc_filters`**： - 自定义 Pandoc Filter 列表。可添加 `.lua` 脚本或可执行文件路径，Filter 将按照列表顺序依次执行。用于扩展 Pandoc 转换功能，如自定义格式处理、特殊语法转换等。默认为空列表。示例：`["%APPDATA%\\npm\\mermaid-filter.cmd"]` 可实现 Mermaid 图表支持。
 * `pandoc_filters_by_conversion`：按转换类型配置 Filters（如 `md_to_docx`、`html_to_md` 等）。
 * `extensible_workflows`：应用扩展配置（按应用/窗口标题匹配不同粘贴模式），详情见下文。
+* **`reverse_paste`**：反向粘贴配置（Word/WPS 富文本 → Markdown → AI 应用），详情见下文。
 
 修改后可在托盘菜单选择 **“重载配置/热键”** 立即生效。
 
 ---
 
+
+## 🔄 反向粘贴：Word/WPS → Markdown → AI
+
+### 功能说明
+
+反向粘贴功能允许你将 **Word/WPS 中的富文本**（含格式、表格、公式等）复制后，
+按下反向粘贴热键，自动将内容转换为 **Markdown** 并粘贴到 AI 聊天框或其他纯文本应用中。
+
+**典型场景**：
+- 将 Word 文档中的内容粘贴到 ChatGPT / DeepSeek 等 AI 的输入框
+- 将带格式的文字从 WPS 转换为 Markdown 后贴入代码仓库、博客等
+
+### 使用方法
+
+1. 在 Word/WPS 中选中并复制内容（`Ctrl+C`）
+2. 切换到目标应用（浏览器、AI 客户端等）
+3. 按下反向粘贴热键（默认 `Ctrl+Shift+V`）
+4. 内容将以 Markdown 格式粘贴到光标位置
+
+### 配置说明
+
+在 `config.json` 中添加或修改 `reverse_paste` 节：
+
+```json
+"reverse_paste": {
+    "enabled": false,
+    "hotkey": "<ctrl>+<shift>+v",
+    "output_style": "gfm",
+    "keep_formula": true,
+    "target_apps": [],
+    "window_patterns": [],
+    "pandoc_filters_by_conversion": {
+        "html_to_md": []
+    }
+}
+```
+
+字段说明：
+
+* `enabled`：是否启用反向粘贴功能（默认 `false`，需手动开启）。
+* `hotkey`：反向粘贴热键（默认 `<ctrl>+<shift>+v`），语法同主热键。
+* `output_style`：Markdown 输出格式，`gfm`（GitHub Flavored Markdown，推荐）或 `commonmark`。
+* `keep_formula`：是否保留 `$...$` LaTeX 公式格式（`true`），否则转换为 MathML（`false`）。
+* `target_apps`：目标应用列表，格式同 `extensible_workflows`。**留空时对所有应用生效。**
+  * Windows 示例：`[{"name": "Chrome", "id": "chrome.exe"}]`
+  * macOS 示例：`[{"name": "Chrome", "id": "com.google.Chrome"}]`
+* `window_patterns`：窗口标题正则匹配（用于浏览器中的特定页面）。
+  * 示例：`["ChatGPT|DeepSeek|Claude|Gemini"]`
+* `pandoc_filters_by_conversion.html_to_md`：反向粘贴专用 HTML→Markdown 转换 Filter。
+
+> **提示**：反向粘贴与主热键（正向粘贴）完全独立，互不干扰。
+
+---
 ## 🔧 高级功能：自定义 Pandoc Filters
 
 ### 什么是 Pandoc Filter？
