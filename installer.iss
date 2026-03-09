@@ -35,7 +35,8 @@ DefaultDirName={autopf}\{#MyAppName}
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
-Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
+; ChineseSimplified.isl is bundled in installer\Languages\ (unofficial translation, not shipped with Inno Setup)
+Name: "chinesesimplified"; MessagesFile: "installer\Languages\ChineseSimplified.isl"
 
 
 [CustomMessages]

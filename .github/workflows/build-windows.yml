@@ -42,7 +42,6 @@ jobs:
             --add-data "assets\icons;assets\icons" `
             --add-data "pastemd\i18n\locales\*.json;pastemd\i18n\locales" `
             --add-data "pastemd\lua;pastemd\lua" `
-            --hidden-import plyer.platforms.win.notification `
             main.py
 
       # 5. 上传 EXE 程序目录为 Artifact（命名：PasteMD-windows）

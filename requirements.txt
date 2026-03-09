@@ -8,7 +8,7 @@ openpyxl
 python-docx
 beautifulsoup4
 lxml
-mathml2omml @ git+https://github.com/AlloteSoftware/mathml2omml_as.git
+mathml2omml
 
 pywin32 ; platform_system == "Windows"
 pync ; platform_system == "Darwin"
