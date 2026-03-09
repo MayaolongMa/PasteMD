@@ -4,6 +4,9 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/MayaolongMa/PasteMD/actions/workflows/build-windows.yml">
+    <img src="https://github.com/MayaolongMa/PasteMD/actions/workflows/build-windows.yml/badge.svg?branch=main" alt="Build Windows">
+  </a>
   <a href="https://github.com/RICHQAQ/PasteMD/releases">
     <img src="https://img.shields.io/github/v/release/RICHQAQ/PasteMD?sort=semver&label=Release&style=flat-square&logo=github" alt="Release">
   </a>
@@ -485,6 +488,29 @@ pyinstaller --clean -F -w -n PasteMD
 ```
 
 生成的程序在 `dist/PasteMD.exe`。
+
+---
+
+## 🤖 GitHub Actions 自动打包
+
+项目内置了 Windows 平台的自动化打包工作流（[`.github/workflows/build-windows.yml`](.github/workflows/build-windows.yml)）。
+
+**触发方式**：
+- 推送到 `main` 分支时自动触发
+- 在 GitHub Actions 页面手动点击 **Run workflow** 触发
+
+**打包流程**：
+1. 在 `windows-latest` Runner 上检出代码
+2. 配置 Python 3.12，安装 `requirements.txt` 依赖及 PyInstaller
+3. 使用 PyInstaller（onedir 模式）打包 `main.py`，自动将图标、i18n 语言包和 Lua 过滤器一并打入包内
+4. 将打包结果上传为 Artifact **`PasteMD-windows`**
+5. 自动检测 `installer.iss`，若存在则调用 Inno Setup 生成安装包，并上传为 Artifact **`PasteMD-installer`**
+
+**下载构建产物**：
+
+在 [Actions 页面](../../actions/workflows/build-windows.yml) 选择任意一次成功的构建，在页面底部 **Artifacts** 区域即可下载：
+- `PasteMD-windows`：程序文件目录（含 `PasteMD.exe` 及运行时依赖）
+- `PasteMD-installer`：Inno Setup 生成的一体化安装包（含自动启动、桌面快捷方式等选项）
 
 ---
 
