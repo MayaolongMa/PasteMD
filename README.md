@@ -483,7 +483,6 @@ pyinstaller --clean -F -w -n PasteMD
   --add-data "assets\icons;assets\icons"
   --add-data "pastemd\i18n\locales\*.json;pastemd\i18n\locales"
   --add-data "pastemd\lua;pastemd\lua"
-  --hidden-import plyer.platforms.win.notification
   main.py
 ```
 
