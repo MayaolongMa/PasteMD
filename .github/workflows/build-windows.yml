@@ -51,7 +51,23 @@ jobs:
           name: PasteMD-windows
           path: dist\PasteMD\
 
-      # 6. 自动检测 installer.iss（Inno Setup 安装包脚本）是否存在
+      # 6. 验证 PyInstaller 产物目录存在且非空
+      - name: Verify build artifacts
+        shell: pwsh
+        run: |
+          $buildDir = "dist\PasteMD"
+          if (-not (Test-Path $buildDir)) {
+            Write-Error "Build artifacts directory '$buildDir' not found. PyInstaller may have failed."
+            exit 1
+          }
+          $files = Get-ChildItem -Path $buildDir -Recurse -File
+          if ($files.Count -eq 0) {
+            Write-Error "Build artifacts directory '$buildDir' is empty. PyInstaller may have failed."
+            exit 1
+          }
+          Write-Host "Build artifacts verified: $($files.Count) file(s) found in '$buildDir'."
+
+      # 7. 自动检测 installer.iss（Inno Setup 安装包脚本）是否存在
       - name: Detect Inno Setup installer script
         id: detect_installer
         shell: pwsh
@@ -64,8 +80,7 @@ jobs:
             Write-Host "No installer script found, skipping installer build"
           }
 
-      # 7. 使用 Inno Setup 生成安装包（仅当 installer.iss 存在时执行）
-      #    通过 /D 参数将 BuildDir 覆盖为 PyInstaller 的 onedir 输出目录
+      # 8. 使用 Inno Setup 生成安装包（仅当 installer.iss 存在时执行）
       - name: Build Inno Setup installer
         if: steps.detect_installer.outputs.found == 'true'
         shell: pwsh
@@ -92,14 +107,13 @@ jobs:
           }
 
           Write-Host "Using Inno Setup compiler: $iscc"
-          # 覆盖 installer.iss 中的 BuildDir，指向 PyInstaller onedir 输出
-          & $iscc /DBuildDir="dist\PasteMD" installer.iss
+          & $iscc installer.iss
           if ($LASTEXITCODE -ne 0) {
             Write-Error "Inno Setup compilation failed with exit code $LASTEXITCODE"
             exit $LASTEXITCODE
           }
 
-      # 8. 上传安装包为 Artifact（命名：PasteMD-installer，仅当生成时）
+      # 9. 上传安装包为 Artifact（命名：PasteMD-installer，仅当生成时）
       - name: Upload installer artifact
         if: steps.detect_installer.outputs.found == 'true'
         uses: actions/upload-artifact@v4
