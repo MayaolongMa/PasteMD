@@ -1,0 +1,109 @@
+# GitHub Actions 工作流：自动打包 PasteMD Windows 版本
+# 触发条件：推送到 main 分支，或手动触发
+name: Build Windows
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build PasteMD for Windows
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      # 1. 拉取代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. 配置 Python 3.12 环境
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 3. 安装项目依赖及打包工具 PyInstaller
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      # 4. 使用 PyInstaller 打包（onedir 模式，便于 Inno Setup 引用）
+      #    --add-data 将图标、i18n 语言包和 Lua 过滤器一并打入包中
+      - name: Build with PyInstaller
+        run: |
+          pyinstaller --clean -w -n PasteMD `
+            --icon "assets\icons\logo.ico" `
+            --add-data "assets\icons;assets\icons" `
+            --add-data "pastemd\i18n\locales\*.json;pastemd\i18n\locales" `
+            --add-data "pastemd\lua;pastemd\lua" `
+            --hidden-import plyer.platforms.win.notification `
+            main.py
+
+      # 5. 上传 EXE 程序目录为 Artifact（命名：PasteMD-windows）
+      - name: Upload Windows EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PasteMD-windows
+          path: dist\PasteMD\
+
+      # 6. 自动检测 installer.iss（Inno Setup 安装包脚本）是否存在
+      - name: Detect Inno Setup installer script
+        id: detect_installer
+        shell: pwsh
+        run: |
+          if (Test-Path "installer.iss") {
+            "found=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+            Write-Host "Inno Setup script found: installer.iss"
+          } else {
+            "found=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+            Write-Host "No installer script found, skipping installer build"
+          }
+
+      # 7. 使用 Inno Setup 生成安装包（仅当 installer.iss 存在时执行）
+      #    通过 /D 参数将 BuildDir 覆盖为 PyInstaller 的 onedir 输出目录
+      - name: Build Inno Setup installer
+        if: steps.detect_installer.outputs.found == 'true'
+        shell: pwsh
+        run: |
+          # 尝试常见的 Inno Setup 安装路径（支持 x86 和 x64，版本 5/6）
+          $candidates = @(
+            "C:\Program Files (x86)\Inno Setup 6\ISCC.exe",
+            "C:\Program Files\Inno Setup 6\ISCC.exe",
+            "C:\Program Files (x86)\Inno Setup 5\ISCC.exe",
+            "C:\Program Files\Inno Setup 5\ISCC.exe"
+          )
+          $iscc = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+          # 如果所有预设路径均未找到，则通过 Chocolatey 安装后从 PATH 查找
+          if (-not $iscc) {
+            Write-Host "Inno Setup not found at common paths, installing via Chocolatey..."
+            choco install innosetup -y --no-progress
+            $iscc = (Get-Command iscc -ErrorAction SilentlyContinue).Source
+          }
+
+          if (-not $iscc) {
+            Write-Error "ISCC.exe not found after installation attempt. Aborting installer build."
+            exit 1
+          }
+
+          Write-Host "Using Inno Setup compiler: $iscc"
+          # 覆盖 installer.iss 中的 BuildDir，指向 PyInstaller onedir 输出
+          & $iscc /DBuildDir="dist\PasteMD" installer.iss
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Inno Setup compilation failed with exit code $LASTEXITCODE"
+            exit $LASTEXITCODE
+          }
+
+      # 8. 上传安装包为 Artifact（命名：PasteMD-installer，仅当生成时）
+      - name: Upload installer artifact
+        if: steps.detect_installer.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: PasteMD-installer
+          path: Output\*.exe
