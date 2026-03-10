@@ -11,4 +11,6 @@ lxml
 mathml2omml
 
 pywin32 ; platform_system == "Windows"
+win10toast ; platform_system == "Windows"
+win11toast ; platform_system == "Windows"
 pync ; platform_system == "Darwin"

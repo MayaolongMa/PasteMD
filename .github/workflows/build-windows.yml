@@ -35,6 +35,7 @@ jobs:
 
       # 4. 使用 PyInstaller 打包（onedir 模式，便于 Inno Setup 引用）
       #    --add-data 将图标、i18n 语言包和 Lua 过滤器一并打入包中
+      #    --hidden-import 确保 plyer Windows 通知后端被打包
       - name: Build with PyInstaller
         run: |
           pyinstaller --clean -w -n PasteMD `
@@ -42,16 +43,58 @@ jobs:
             --add-data "assets\icons;assets\icons" `
             --add-data "pastemd\i18n\locales\*.json;i18n\locales" `
             --add-data "pastemd\lua;pastemd\lua" `
+            --hidden-import plyer.platforms.win.notification `
             main.py
 
-      # 5. 上传 EXE 程序目录为 Artifact（命名：PasteMD-windows）
+      # 5. 下载 Pandoc Windows 可执行文件并放置到 dist\PasteMD\pandoc\pandoc.exe
+      #    这与 find_pandoc() 查找逻辑一致：{exe_dir}/pandoc/pandoc.exe
+      - name: Download and bundle Pandoc
+        shell: pwsh
+        run: |
+          $pandocApiUrl = "https://api.github.com/repos/jgm/pandoc/releases/latest"
+          try {
+            $releaseInfo = Invoke-RestMethod -Uri $pandocApiUrl `
+              -Headers @{ Accept = "application/vnd.github.v3+json"; "User-Agent" = "PasteMD-build" } `
+              -ErrorAction Stop
+          } catch {
+            Write-Error "Failed to query pandoc release API: $_"
+            exit 1
+          }
+          $pandocVersion = $releaseInfo.tag_name
+          if (-not $pandocVersion) {
+            Write-Error "Could not determine pandoc version from API response"
+            exit 1
+          }
+          $pandocUrl = "https://github.com/jgm/pandoc/releases/download/$pandocVersion/pandoc-$pandocVersion-windows-x86_64.zip"
+          Write-Host "Downloading pandoc $pandocVersion from $pandocUrl ..."
+          try {
+            Invoke-WebRequest -Uri $pandocUrl -OutFile "pandoc.zip" -ErrorAction Stop
+          } catch {
+            Write-Error "Failed to download pandoc: $_"
+            exit 1
+          }
+          if (-not (Test-Path "pandoc.zip") -or (Get-Item "pandoc.zip").Length -eq 0) {
+            Write-Error "pandoc.zip download appears incomplete or empty"
+            exit 1
+          }
+          Expand-Archive -Path "pandoc.zip" -DestinationPath "pandoc_extracted" -Force
+          $pandocExe = Get-ChildItem -Path "pandoc_extracted" -Filter "pandoc.exe" -Recurse | Select-Object -First 1
+          if (-not $pandocExe) {
+            Write-Error "pandoc.exe not found in archive"
+            exit 1
+          }
+          New-Item -ItemType Directory -Force -Path "dist\PasteMD\pandoc" | Out-Null
+          Copy-Item $pandocExe.FullName -Destination "dist\PasteMD\pandoc\pandoc.exe"
+          Write-Host "Pandoc $pandocVersion bundled at dist\PasteMD\pandoc\pandoc.exe"
+
+      # 6. 上传 EXE 程序目录为 Artifact（命名：PasteMD-windows）
       - name: Upload Windows EXE artifact
         uses: actions/upload-artifact@v4
         with:
           name: PasteMD-windows
           path: dist\PasteMD\
 
-      # 6. 验证 PyInstaller 产物目录存在且非空
+      # 7. 验证 PyInstaller 产物目录存在且非空
       - name: Verify build artifacts
         shell: pwsh
         run: |
@@ -67,7 +110,7 @@ jobs:
           }
           Write-Host "Build artifacts verified: $($files.Count) file(s) found in '$buildDir'."
 
-      # 7. 自动检测 installer.iss（Inno Setup 安装包脚本）是否存在
+      # 8. 自动检测 installer.iss（Inno Setup 安装包脚本）是否存在
       - name: Detect Inno Setup installer script
         id: detect_installer
         shell: pwsh
@@ -80,7 +123,7 @@ jobs:
             Write-Host "No installer script found, skipping installer build"
           }
 
-      # 8. 使用 Inno Setup 生成安装包（仅当 installer.iss 存在时执行）
+      # 9. 使用 Inno Setup 生成安装包（仅当 installer.iss 存在时执行）
       - name: Build Inno Setup installer
         if: steps.detect_installer.outputs.found == 'true'
         shell: pwsh
@@ -113,7 +156,7 @@ jobs:
             exit $LASTEXITCODE
           }
 
-      # 9. 上传安装包为 Artifact（命名：PasteMD-installer，仅当生成时）
+      # 10. 上传安装包为 Artifact（命名：PasteMD-installer，仅当生成时）
       - name: Upload installer artifact
         if: steps.detect_installer.outputs.found == 'true'
         uses: actions/upload-artifact@v4
