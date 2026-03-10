@@ -4,10 +4,8 @@
 #define MyAppExeName "PasteMD.exe"
 ; AppUserModelID 用于 Win11 通知归属与图标
 #define MyAUMID        "RichQAQ.PasteMD"
-; Nuitka 构建目录
-#define BuildDir       "nuitka\\main.dist"
-; 如果是 onedir，改为发行目录：例如
-; #define BuildDir     "dist\\PasteMD"
+; PyInstaller onedir 构建目录
+#define BuildDir       "dist\\PasteMD"
 
 ; ICO 源文件
 #define MyIconSrc      "assets\\icons\\logo.ico"
@@ -55,14 +53,11 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "autorun";     Description: "{cm:AutoStartup}";      GroupDescription: "{cm:AdditionalOptions}"
 
 [Files]
-; Nuitka onedir：完整拷贝运行目录
+; PyInstaller onedir：完整拷贝运行目录
 Source: "{#BuildDir}\*"; DestDir: "{app}"; \
     Flags: ignoreversion recursesubdirs createallsubdirs
 ; 安装时把图标拷到 {app}\icon.ico
 Source: "{#MyIconSrc}"; DestDir: "{app}"; DestName: "icon.ico"; Flags: ignoreversion
-
-; 如果你是 onedir，并且有更多运行时文件需要带上，在下方取消注释：
-; Source: "{#BuildDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [InstallDelete]
 ; 安装前清空安装目录下的所有文件和子目录
