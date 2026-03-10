@@ -31,9 +31,9 @@ def resource_path(relative_path: str) -> str:
         # 源码运行
         base_dir = get_base_dir()
 
-    if not os.path.isfile(os.path.join(base_dir, relative_path)):
+    if not os.path.exists(os.path.join(base_dir, relative_path)):
         relative_path_pastemd = os.path.join("pastemd", relative_path)
-        if os.path.isfile(os.path.join(base_dir, relative_path_pastemd)):
+        if os.path.exists(os.path.join(base_dir, relative_path_pastemd)):
             relative_path = relative_path_pastemd
 
     return os.path.join(base_dir, relative_path)

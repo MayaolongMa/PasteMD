@@ -481,7 +481,7 @@ python main.py
 pyinstaller --clean -F -w -n PasteMD
   --icon assets\icons\logo.ico
   --add-data "assets\icons;assets\icons"
-  --add-data "pastemd\i18n\locales\*.json;pastemd\i18n\locales"
+  --add-data "pastemd\i18n\locales\*.json;i18n\locales"
   --add-data "pastemd\lua;pastemd\lua"
   main.py
 ```
